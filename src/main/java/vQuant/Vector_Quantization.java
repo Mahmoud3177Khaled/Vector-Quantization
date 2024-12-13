@@ -237,6 +237,11 @@ public class Vector_Quantization {
                 }
             }
 
+            if(numWithThisIndex == 0) {
+                currBlockIndex++;
+                continue;
+            }
+
             ArrayList<ArrayList<Double>> avgBlock = new ArrayList<ArrayList<Double>>();
             
             for (int i = 0; i < 2; i++) {
@@ -255,6 +260,11 @@ public class Vector_Quantization {
                 }
                 avgBlock.add(row);
             }
+
+            // if(numWithThisIndex == 0) {
+            //     continue;
+            // }
+
             codeBookBlocks.add(avgBlock);
             currBlockIndex++;
         }
@@ -298,6 +308,11 @@ public class Vector_Quantization {
         // }   
 
         for (ArrayList<ArrayList<Double>> codeBlock : codeBookBlocks) {
+
+            if(codeBlock.get(0).get(0).isNaN()) {
+                continue;
+            }
+
             block1 = new ArrayList<ArrayList<Double>>();
             block2 = new ArrayList<ArrayList<Double>>();
 
@@ -363,20 +378,24 @@ public class Vector_Quantization {
             codeBookBlocks.add(firstBlock);
 
             // size of code book
-            int k = 2;
+            int k = 3;
             while (k != 0) {
 
                 splitCodeBlock();
                 allocateToCodeBlock();
-                if(k > 0) {
-                getNew2x2CodeblockWithAvgs();
                 itr++;
-                allocateToCodeBlock();
+                if(k > 0) {
+                    getNew2x2CodeblockWithAvgs();
+                    // allocateToCodeBlock();
+                    // getNew2x2CodeblockWithAvgs();
+                    // allocateToCodeBlock();
                 }
-                k--;
-            }
+            k--;
+        }
             itr--;
+            allocateToCodeBlock();
             getNew2x2CodeblockWithAvgs();
+            allocateToCodeBlock();
             // allocateToCodeBlock();
             // allocateToCodeBlock();
             // getNew2x2CodeblockWithAvgs();
