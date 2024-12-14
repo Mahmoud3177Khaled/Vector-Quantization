@@ -125,7 +125,7 @@ public class Vector_Quantization {
                 }
                 // System.out.println(cornerAvg/((imageHeight*imageWidth)/4));
                 // System.out.println("j: " + j + "  i: " + i);
-                row.add(cornerAvg/((imageHeight*imageWidth)/4));
+                row.add(cornerAvg/(((imageHeight*imageWidth)/(codeBookBlockSize*codeBookBlockSize))));
 
             }
             firstBlock.add(row);
