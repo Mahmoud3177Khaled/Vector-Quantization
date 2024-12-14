@@ -309,9 +309,9 @@ public class Vector_Quantization {
 
         for (ArrayList<ArrayList<Double>> codeBlock : codeBookBlocks) {
 
-            if(codeBlock.get(0).get(0).isNaN()) {
-                continue;
-            }
+            // if(codeBlock.get(0).get(0).isNaN()) {
+            //     continue;
+            // }
 
             block1 = new ArrayList<ArrayList<Double>>();
             block2 = new ArrayList<ArrayList<Double>>();
@@ -378,7 +378,7 @@ public class Vector_Quantization {
             codeBookBlocks.add(firstBlock);
 
             // size of code book
-            int k = 3;
+            int k = 2;
             while (k != 0) {
 
                 splitCodeBlock();
