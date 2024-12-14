@@ -1,10 +1,12 @@
 package vQuant;
 
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+
+import javax.imageio.ImageIO;
 
 public class Vector_Quantization {
 
@@ -17,7 +19,7 @@ public class Vector_Quantization {
     static int itr = 1;
 
     static ArrayList<ArrayList<ArrayList<Integer>>> ogImageAs2x2Blocks = new ArrayList<ArrayList<ArrayList<Integer>>>();
-    static ArrayList<ImageBlock> imageAsCodeBlocksWithIndexes = new ArrayList<ImageBlock>();
+    static ArrayList<ImageBlock> imageAsBlocksWithIndexes = new ArrayList<ImageBlock>();
     static ArrayList<ArrayList<ArrayList<Double>>> codeBookBlocks = new ArrayList<ArrayList<ArrayList<Double>>>();
 
     public static void createTestImage() {
@@ -151,7 +153,7 @@ public class Vector_Quantization {
                 }
                 
                 ImageBlock blockObj = new ImageBlock(0, block);
-                imageAsCodeBlocksWithIndexes.add(blockObj);
+                imageAsBlocksWithIndexes.add(blockObj);
 
         
 
@@ -174,12 +176,12 @@ public class Vector_Quantization {
         //         block.add(row2);
 
         //         ImageBlock blockObj = new ImageBlock(0, block);
-        //         imageAsCodeBlocksWithIndexes.add(blockObj);
+        //         imageAsBlocksWithIndexes.add(blockObj);
 
         //     }
         // }
 
-        // for (ImageBlock imageBlock : imageAsCodeBlocksWithIndexes) {
+        // for (ImageBlock imageBlock : imageAsBlocksWithIndexes) {
             
         //     System.out.println("index: " + imageBlock.index);
         //     for (int i = 0; i < 2; i++) {
@@ -195,7 +197,7 @@ public class Vector_Quantization {
 
     public static void allocateToCodeBlock() {
 
-        for (ImageBlock imageBlock : imageAsCodeBlocksWithIndexes) {
+        for (ImageBlock imageBlock : imageAsBlocksWithIndexes) {
             int index = 0;
             int minBlock = 0;
             double min = 10000000;
@@ -225,7 +227,7 @@ public class Vector_Quantization {
 
         }
 
-        // for (ImageBlock imageBlock : imageAsCodeBlocksWithIndexes) {
+        // for (ImageBlock imageBlock : imageAsBlocksWithIndexes) {
             
         //     System.out.println("index: " + imageBlock.index);
         //     for (int i = 0; i < 2; i++) {
@@ -254,7 +256,7 @@ public class Vector_Quantization {
         int currBlockIndex = 0;
         for (int k = 0; k < Math.pow(2, itr); k++) {
             int numWithThisIndex = 0;
-            for (ImageBlock imageBlock : imageAsCodeBlocksWithIndexes) {
+            for (ImageBlock imageBlock : imageAsBlocksWithIndexes) {
                 if(imageBlock.index == currBlockIndex) {
                     numWithThisIndex++;
                 }
@@ -272,7 +274,7 @@ public class Vector_Quantization {
                 for (int j = 0; j < codeBookBlockSize; j++) {
 
                     double cornerAvg = 0;
-                    for (ImageBlock imageBlock : imageAsCodeBlocksWithIndexes) {
+                    for (ImageBlock imageBlock : imageAsBlocksWithIndexes) {
                         if(imageBlock.index == currBlockIndex) {
                             
                             cornerAvg += imageBlock.block.get(i).get(j);
@@ -414,6 +416,34 @@ public class Vector_Quantization {
         // System.out.println(codeBookBlocks.size());
     }
 
+    public static void compileCompressedImage(String outPutFile) {
+        // ArrayList<ArrayList<Integer>> compressedImageInCodeBookBlocks = new ArrayList<ArrayList<Integer>>();
+        try {
+            FileWriter writer = new FileWriter(new File(outPutFile + ".txt"));
+            
+            String row = "";
+            int i = 1;
+            for (ImageBlock imageBlock : imageAsBlocksWithIndexes) {
+                
+                row += imageBlock.index + " ";
+
+                if (i % (imageWidth/codeBookBlockSize) == 0) {
+                    row += "\n";
+                    
+                }
+                
+                i++;
+            }
+            
+            writer.write(row);
+            writer.close();
+
+        } catch (IOException e) {
+            System.out.println("can not save compressed image");
+        }
+
+        // return compressedImageInCodeBookBlocks;
+    }
 
     public static void main(String[] args) {
         String inputImagePath = "test.bmp"; // Replace with your BMP input image path
@@ -461,8 +491,10 @@ public class Vector_Quantization {
             // allocateToCodeBlock();
             // allocateToCodeBlock();
 
+            compileCompressedImage("comressedImage");
 
-            for (ImageBlock imageBlock : imageAsCodeBlocksWithIndexes) {
+
+            for (ImageBlock imageBlock : imageAsBlocksWithIndexes) {
             
                 System.out.println("index: " + imageBlock.index);
                 for (int i = 0; i < codeBookBlockSize; i++) {
