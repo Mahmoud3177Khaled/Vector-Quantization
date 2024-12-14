@@ -445,6 +445,37 @@ public class Vector_Quantization {
         // return compressedImageInCodeBookBlocks;
     }
 
+    public static void saveCodeBooksToFile() {
+        try {
+            FileWriter writer = new FileWriter(new File("codebook.txt"));
+            
+            String row = "";
+            int i = 0;
+            for (ArrayList<ArrayList<Double>> codeBookBlock : codeBookBlocks) {
+                
+                row += i;
+                row += "\n";
+
+                for (int j = 0; j < codeBookBlockSize; j++) {
+                    for (int k = 0; k < codeBookBlockSize; k++) {
+                        
+                        row += codeBookBlock.get(j).get(k) + " ";
+
+                    }
+                    row += "\n";
+                }
+                
+                i++;
+            }
+            
+            writer.write(row);
+            writer.close();
+
+        } catch (IOException e) {
+            System.out.println("can not save compressed image");
+        }
+    }
+
     public static void main(String[] args) {
         String inputImagePath = "test.bmp"; // Replace with your BMP input image path
         // String inputImagePath = "photographer.bmp";
@@ -492,6 +523,7 @@ public class Vector_Quantization {
             // allocateToCodeBlock();
 
             compileCompressedImage("comressedImage");
+            saveCodeBooksToFile();
 
 
             for (ImageBlock imageBlock : imageAsBlocksWithIndexes) {
