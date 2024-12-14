@@ -11,6 +11,9 @@ public class Vector_Quantization {
     static int imageHeight = 0;
     static int imageWidth = 0;
 
+    static int codeBookSize = 0;
+    static int codeBookBlockSize = 0;
+
     static int itr = 1;
 
     static ArrayList<ArrayList<ArrayList<Integer>>> ogImageAs2x2Blocks = new ArrayList<ArrayList<ArrayList<Integer>>>();
@@ -108,14 +111,14 @@ public class Vector_Quantization {
 
         double cornerAvg = 0;
         
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < codeBookBlockSize; i++) {
 
             ArrayList<Double> row = new ArrayList<Double>();
-            for (int j = 0; j < 2; j++) {
+            for (int j = 0; j < codeBookBlockSize; j++) {
 
                 cornerAvg = 0;
-                for (int y = i; y < imageHeight; y = y + 2) {
-                    for (int x = j; x < imageWidth; x = x + 2) {
+                for (int y = i; y < imageHeight; y = y + codeBookBlockSize) {
+                    for (int x = j; x < imageWidth; x = x + codeBookBlockSize) {
                         cornerAvg += inputImage.get(y).get(x);
                         // System.out.println(inputImage.get(y).get(x) );
                     }
@@ -135,26 +138,46 @@ public class Vector_Quantization {
     public static void cutImageIntoBlocks(ArrayList<ArrayList<Integer>> inputImage) {
         ArrayList<ArrayList<Integer>> block = new ArrayList<ArrayList<Integer>>();
 
-        for (int y = 0; y < imageHeight; y = y + 2) {
-            for (int x = 0; x < imageWidth; x = x + 2) {
+        for (int y = 0; y < imageHeight; y = y + codeBookBlockSize) {
+            for (int x = 0; x < imageWidth; x = x + codeBookBlockSize) {
+                
                 block = new ArrayList<ArrayList<Integer>>();
+                for (int i = 0; i < codeBookBlockSize; i++) {
+                    ArrayList<Integer> row = new ArrayList<Integer>();
+                    for (int j = 0; j < codeBookBlockSize; j++) {
+                        row.add(inputImage.get(y+i).get(x+j));
+                    }
+                    block.add(row);
+                }
                 
-                ArrayList<Integer> row1 = new ArrayList<Integer>();
-                ArrayList<Integer> row2 = new ArrayList<Integer>();
-                
-                row1.add(inputImage.get(y).get(x));
-                row1.add(inputImage.get(y).get(x+1));
-                row2.add(inputImage.get(y+1).get(x));
-                row2.add(inputImage.get(y+1).get(x+1));
-
-                block.add(row1);
-                block.add(row2);
-
                 ImageBlock blockObj = new ImageBlock(0, block);
                 imageAsCodeBlocksWithIndexes.add(blockObj);
 
+        
+
             }
         }
+
+        // for (int y = 0; y < imageHeight; y = y + codeBookBlockSize) {
+        //     for (int x = 0; x < imageWidth; x = x + codeBookBlockSize) {
+        //         block = new ArrayList<ArrayList<Integer>>();
+                
+        //         ArrayList<Integer> row1 = new ArrayList<Integer>();
+        //         ArrayList<Integer> row2 = new ArrayList<Integer>();
+                
+        //         row1.add(inputImage.get(y).get(x));
+        //         row1.add(inputImage.get(y).get(x+1));
+        //         row2.add(inputImage.get(y+1).get(x));
+        //         row2.add(inputImage.get(y+1).get(x+1));
+
+        //         block.add(row1);
+        //         block.add(row2);
+
+        //         ImageBlock blockObj = new ImageBlock(0, block);
+        //         imageAsCodeBlocksWithIndexes.add(blockObj);
+
+        //     }
+        // }
 
         // for (ImageBlock imageBlock : imageAsCodeBlocksWithIndexes) {
             
@@ -179,8 +202,8 @@ public class Vector_Quantization {
             for (ArrayList<ArrayList<Double>> codeBlock : codeBookBlocks) {
 
                 double diff = 0;
-                for (int i = 0; i < 2; i++) {
-                    for (int j = 0; j < 2; j++) {
+                for (int i = 0; i < codeBookBlockSize; i++) {
+                    for (int j = 0; j < codeBookBlockSize; j++) {
                         diff += Math.abs(codeBlock.get(i).get(j) - imageBlock.block.get(i).get(j));
                     }
                 }
@@ -244,9 +267,9 @@ public class Vector_Quantization {
 
             ArrayList<ArrayList<Double>> avgBlock = new ArrayList<ArrayList<Double>>();
             
-            for (int i = 0; i < 2; i++) {
+            for (int i = 0; i < codeBookBlockSize; i++) {
                 ArrayList<Double> row = new ArrayList<Double>();
-                for (int j = 0; j < 2; j++) {
+                for (int j = 0; j < codeBookBlockSize; j++) {
 
                     double cornerAvg = 0;
                     for (ImageBlock imageBlock : imageAsCodeBlocksWithIndexes) {
@@ -313,14 +336,45 @@ public class Vector_Quantization {
             //     continue;
             // }
 
+            // block1 = new ArrayList<ArrayList<Double>>();
+            // block2 = new ArrayList<ArrayList<Double>>();
+
+            // for (int y = 0; y < imageHeight; y++) {
+            //     ArrayList<Double> row1 = new ArrayList<Double>();
+            //     ArrayList<Double> row2 = new ArrayList<Double>();
+            //     for (int x = 0; x < imageWidth; x++) {
+
+            //         if(codeBlock.get(y).get(x) % 1 == 0) {
+            //             row1.add(codeBlock.get(y).get(x)-1);
+            //             row2.add(codeBlock.get(y).get(x)+1);
+
+            //         } else {
+                        
+            //             row1.add(Math.floor(codeBlock.get(y).get(x)));
+            //             row2.add(Math.ceil(codeBlock.get(y).get(x)));
+
+            //         }
+            //     }
+            //     block1.add(row1);
+            //     block2.add(row2);
+            // }
+            // newCOdeBlocks.add(block1);
+            // newCOdeBlocks.add(block2);
+            // codeBookBlocks = newCOdeBlocks;
+
+
+            // System.out.println(cornerAvg/((imageHeight*imageWidth)/4));
+            // System.out.println("j: " + j + "  i: " + i);
+            // row.add(cornerAvg/((imageHeight*imageWidth)/4));
+
             block1 = new ArrayList<ArrayList<Double>>();
             block2 = new ArrayList<ArrayList<Double>>();
 
-            for (int i = 0; i < 2; i++) {
+            for (int i = 0; i < codeBookBlockSize; i++) {
                 ArrayList<Double> row1 = new ArrayList<Double>();
                 ArrayList<Double> row2 = new ArrayList<Double>();
 
-                for (int j = 0; j < 2; j++) {
+                for (int j = 0; j < codeBookBlockSize; j++) {
 
                     if(codeBlock.get(i).get(j) % 1 == 0) {
                         row1.add(codeBlock.get(i).get(j)-1);
@@ -363,6 +417,7 @@ public class Vector_Quantization {
 
     public static void main(String[] args) {
         String inputImagePath = "test.bmp"; // Replace with your BMP input image path
+        // String inputImagePath = "photographer.bmp";
         String outputImagePath = "output_image.bmp"; // Replace with your BMP output image path
 
         try {
@@ -371,26 +426,30 @@ public class Vector_Quantization {
             ArrayList<ArrayList<Integer>> inputImage = readGrayscaleImage(inputImagePath);
             ArrayList<ArrayList<Double>> outputImage = new ArrayList<ArrayList<Double>>();
 
+            // size of code book block
+            codeBookBlockSize = 2;
+            // size of code book
+            codeBookSize = 2;
+
             cutImageIntoBlocks(inputImage);
 
 
             ArrayList<ArrayList<Double>> firstBlock = getFirst2x2block(inputImage);
             codeBookBlocks.add(firstBlock);
 
-            // size of code book
-            int k = 2;
-            while (k != 0) {
+
+            while (codeBookSize != 0) {
 
                 splitCodeBlock();
                 allocateToCodeBlock();
                 itr++;
-                if(k > 0) {
+                if(codeBookSize > 0) {
                     getNew2x2CodeblockWithAvgs();
                     // allocateToCodeBlock();
                     // getNew2x2CodeblockWithAvgs();
                     // allocateToCodeBlock();
                 }
-            k--;
+                codeBookSize--;
         }
             itr--;
             allocateToCodeBlock();
@@ -406,8 +465,8 @@ public class Vector_Quantization {
             for (ImageBlock imageBlock : imageAsCodeBlocksWithIndexes) {
             
                 System.out.println("index: " + imageBlock.index);
-                for (int i = 0; i < 2; i++) {
-                    for (int j = 0; j < 2; j++) {
+                for (int i = 0; i < codeBookBlockSize; i++) {
+                    for (int j = 0; j < codeBookBlockSize; j++) {
                         System.out.print(imageBlock.block.get(i).get(j) + " ");
                         
                     }
@@ -420,8 +479,8 @@ public class Vector_Quantization {
             System.out.println();
 
             for (ArrayList<ArrayList<Double>> codeBlock : codeBookBlocks) {
-                for (int i = 0; i < 2; i++) {
-                    for (int j = 0; j < 2; j++) {
+                for (int i = 0; i < codeBookBlockSize; i++) {
+                    for (int j = 0; j < codeBookBlockSize; j++) {
                         System.out.print(codeBlock.get(i).get(j) + " ");
                     }
                     System.out.println();
