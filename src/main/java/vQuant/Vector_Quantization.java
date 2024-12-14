@@ -105,7 +105,7 @@ public class Vector_Quantization {
 
 
 
-    public static ArrayList<ArrayList<Double>> getFirst2x2block(ArrayList<ArrayList<Integer>> inputImage) {
+    public static ArrayList<ArrayList<Double>> getFirstCodeBlock(ArrayList<ArrayList<Integer>> inputImage) {
 
         ArrayList<ArrayList<Double>> firstBlock = new ArrayList<ArrayList<Double>>();
 
@@ -242,7 +242,7 @@ public class Vector_Quantization {
         // System.out.println();
     }
 
-    public static void getNew2x2CodeblockWithAvgs() {
+    public static void getNewCodeBlockUsingAvgs() {
 
         codeBookBlocks.clear();
 
@@ -434,7 +434,7 @@ public class Vector_Quantization {
             cutImageIntoBlocks(inputImage);
 
 
-            ArrayList<ArrayList<Double>> firstBlock = getFirst2x2block(inputImage);
+            ArrayList<ArrayList<Double>> firstBlock = getFirstCodeBlock(inputImage);
             codeBookBlocks.add(firstBlock);
 
 
@@ -444,20 +444,20 @@ public class Vector_Quantization {
                 allocateToCodeBlock();
                 itr++;
                 if(codeBookSize > 0) {
-                    getNew2x2CodeblockWithAvgs();
+                    getNewCodeBlockUsingAvgs();
                     // allocateToCodeBlock();
-                    // getNew2x2CodeblockWithAvgs();
+                    // getNewCodeBlockUsingAvgs();
                     // allocateToCodeBlock();
                 }
                 codeBookSize--;
         }
             itr--;
             allocateToCodeBlock();
-            getNew2x2CodeblockWithAvgs();
+            getNewCodeBlockUsingAvgs();
             allocateToCodeBlock();
             // allocateToCodeBlock();
             // allocateToCodeBlock();
-            // getNew2x2CodeblockWithAvgs();
+            // getNewCodeBlockUsingAvgs();
             // allocateToCodeBlock();
             // allocateToCodeBlock();
 
