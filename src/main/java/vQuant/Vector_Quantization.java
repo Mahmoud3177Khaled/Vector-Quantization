@@ -17,10 +17,13 @@ public class Vector_Quantization {
     static int codeBookBlockSize = 0;
 
     static int itr = 1;
+    static boolean notSameImageBlocksIndexes = true;
 
-    static ArrayList<ArrayList<ArrayList<Integer>>> ogImageAs2x2Blocks = new ArrayList<ArrayList<ArrayList<Integer>>>();
+    // static ArrayList<ArrayList<ArrayList<Integer>>> ogImageAs2x2Blocks = new ArrayList<ArrayList<ArrayList<Integer>>>();
     static ArrayList<ImageBlock> imageAsBlocksWithIndexes = new ArrayList<ImageBlock>();
     static ArrayList<ArrayList<ArrayList<Double>>> codeBookBlocks = new ArrayList<ArrayList<ArrayList<Double>>>();
+
+    static ArrayList<Integer> tempImageBlocksIndexes = new ArrayList<Integer>();
 
     public static void createTestImage() {
         // Define the pixel values (6x6 array)
@@ -197,6 +200,13 @@ public class Vector_Quantization {
 
     public static void allocateToCodeBlock() {
 
+        notSameImageBlocksIndexes = true;
+        tempImageBlocksIndexes.clear();
+
+        for (ImageBlock imageBlock : imageAsBlocksWithIndexes) {
+            tempImageBlocksIndexes.add(imageBlock.index);
+        }
+
         for (ImageBlock imageBlock : imageAsBlocksWithIndexes) {
             int index = 0;
             int minBlock = 0;
@@ -225,6 +235,27 @@ public class Vector_Quantization {
 
             imageBlock.index = minBlock;
 
+        }
+
+        // System.out.println("\n");
+        // for (Integer temp : tempImageBlocksIndexes) {
+        //     System.out.print(temp + " ");
+        // }
+        // System.out.println("");
+        // for (ImageBlock imageBlock : imageAsBlocksWithIndexes) {
+        //     System.out.print(imageBlock.index + " ");
+
+        // }
+        int i = 0;
+        for (ImageBlock imageBlock : imageAsBlocksWithIndexes) {
+            if(imageBlock.index != tempImageBlocksIndexes.get(i)) {
+                notSameImageBlocksIndexes = true;
+                break;
+            } else {
+                notSameImageBlocksIndexes = false;
+                
+            }
+            i++;
         }
 
         // for (ImageBlock imageBlock : imageAsBlocksWithIndexes) {
@@ -477,20 +508,20 @@ public class Vector_Quantization {
     }
 
     public static void main(String[] args) {
-        String inputImagePath = "test.bmp"; // Replace with your BMP input image path
-        // String inputImagePath = "photographer.bmp";
-        String outputImagePath = "output_image.bmp"; // Replace with your BMP output image path
+        // String inputImagePath = "test.bmp"; // Replace with your BMP input image path
+        String inputImagePath = "photographer.bmp";
+        // String outputImagePath = "output_image.bmp"; // Replace with your BMP output image path
 
         try {
             createTestImage();
 
             ArrayList<ArrayList<Integer>> inputImage = readGrayscaleImage(inputImagePath);
-            ArrayList<ArrayList<Double>> outputImage = new ArrayList<ArrayList<Double>>();
+            // ArrayList<ArrayList<Double>> outputImage = new ArrayList<ArrayList<Double>>();
 
             // size of code book block
             codeBookBlockSize = 2;
             // size of code book
-            codeBookSize = 2;
+            codeBookSize = 3;
 
             cutImageIntoBlocks(inputImage);
 
@@ -498,29 +529,47 @@ public class Vector_Quantization {
             ArrayList<ArrayList<Double>> firstBlock = getFirstCodeBlock(inputImage);
             codeBookBlocks.add(firstBlock);
 
-
             while (codeBookSize != 0) {
 
                 splitCodeBlock();
                 allocateToCodeBlock();
                 itr++;
-                if(codeBookSize > 0) {
-                    getNewCodeBlockUsingAvgs();
-                    // allocateToCodeBlock();
-                    // getNewCodeBlockUsingAvgs();
-                    // allocateToCodeBlock();
-                }
+                getNewCodeBlockUsingAvgs();
+                // System.out.println(notSameImageBlocksIndexes);
                 codeBookSize--;
-        }
+            }
+
             itr--;
-            allocateToCodeBlock();
-            getNewCodeBlockUsingAvgs();
-            allocateToCodeBlock();
+            // System.out.println(notSameImageBlocksIndexes);
+            while (notSameImageBlocksIndexes) {
+                getNewCodeBlockUsingAvgs();
+                allocateToCodeBlock();
+
+            }
             // allocateToCodeBlock();
+
+            // while (codeBookSize != 0) {
+
+            //     splitCodeBlock();
+            //     allocateToCodeBlock();
+            //     itr++;
+            //     if(codeBookSize > 0) {
+            //         getNewCodeBlockUsingAvgs();
+            //         // allocateToCodeBlock();
+            //         // getNewCodeBlockUsingAvgs();
+            //         // allocateToCodeBlock();
+            //     }
+            //     codeBookSize--;
+            // }
+            // itr--;
             // allocateToCodeBlock();
             // getNewCodeBlockUsingAvgs();
             // allocateToCodeBlock();
-            // allocateToCodeBlock();
+            // // allocateToCodeBlock();
+            // // allocateToCodeBlock();
+            // // getNewCodeBlockUsingAvgs();
+            // // allocateToCodeBlock();
+            // // allocateToCodeBlock();
 
             compileCompressedImage("comressedImage");
             saveCodeBooksToFile();
