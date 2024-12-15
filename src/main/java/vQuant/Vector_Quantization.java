@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 import javax.imageio.ImageIO;
 
@@ -474,6 +475,56 @@ public class Vector_Quantization {
         } catch (IOException e) {
             System.out.println("can not save compressed image");
         }
+    }
+
+    public static ArrayList<ArrayList<Integer>> constructDecompressedImage() {
+        codeBookBlocks = new ArrayList<ArrayList<ArrayList<Double>>>();
+        try(Scanner codeBookScanner = new Scanner(new File("codebook.txt"))) {
+            while (codeBookScanner.hasNextLine()) {
+                if (!codeBookScanner.hasNextInt())
+                    break;
+                codeBookScanner.nextLine();
+                ArrayList<ArrayList<Double>> block = new ArrayList<>();
+                for (int i = 0; i < codeBookBlockSize; i++) {
+                    ArrayList<Double> lineDouble = new ArrayList<Double>();
+                    String[] line = codeBookScanner.nextLine().split(" ");
+                    for (String s : line) {
+                        lineDouble.add(Double.parseDouble(s));
+                    }
+                    block.add(lineDouble);
+                }
+                codeBookBlocks.add(block);
+            }
+            codeBookBlockSize = codeBookBlocks.get(0).get(0).size();
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+        ArrayList<ArrayList<Integer>> image = new ArrayList<ArrayList<Integer>>();
+        ArrayList<ArrayList<Integer>> compressedImage = new ArrayList<ArrayList<Integer>>();
+
+        try (Scanner compressedImageScanner = new Scanner(new File("comressedImage.txt"))) {
+            while (compressedImageScanner.hasNextLine()) {
+                ArrayList<Integer> lineInteger = new ArrayList<>();
+                String[] line = compressedImageScanner.nextLine().split(" ");
+                for (String s : line) {
+                    lineInteger.add(Integer.parseInt(s));
+                }
+                compressedImage.add(lineInteger);
+            }
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+        imageHeight = compressedImage.size() * codeBookBlockSize;
+        imageWidth = compressedImage.get(0).size() * codeBookBlockSize;
+        for (int i = 0; i < imageHeight; i++) {
+            ArrayList<Integer> line = new ArrayList<>();
+            for (int j = 0; j < imageWidth; j++) {
+                int blockIndex = compressedImage.get(i / codeBookBlockSize).get(j / codeBookBlockSize);
+                line.add((codeBookBlocks.get(blockIndex).get(i % codeBookBlockSize).get(j % codeBookBlockSize)).intValue());
+            }
+            image.add(line);
+        }
+        return image;
     }
 
     public static void main(String[] args) {
