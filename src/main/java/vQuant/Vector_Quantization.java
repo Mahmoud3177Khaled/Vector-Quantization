@@ -508,7 +508,62 @@ public class Vector_Quantization {
         }
     }
 
-    public static void main(String[] args) {
+    public static ArrayList<ArrayList<Integer>> constructDecompressedImage() {
+        System.out.println("Code book file name: ");
+        Scanner consoleScanner = new Scanner(System.in);
+        String codeBookFile = consoleScanner.nextLine();
+        codeBookBlocks = new ArrayList<ArrayList<ArrayList<Double>>>();
+        try(Scanner codeBookScanner = new Scanner(new File(codeBookFile))) {
+            while (codeBookScanner.hasNextLine()) {
+                if (!codeBookScanner.hasNextInt())
+                    break;
+                codeBookScanner.nextLine();
+                ArrayList<ArrayList<Double>> block = new ArrayList<>();
+                for (int i = 0; i < codeBookBlockSize; i++) {
+                    ArrayList<Double> lineDouble = new ArrayList<Double>();
+                    String[] line = codeBookScanner.nextLine().split(" ");
+                    for (String s : line) {
+                        lineDouble.add(Double.parseDouble(s));
+                    }
+                    block.add(lineDouble);
+                }
+                codeBookBlocks.add(block);
+            }
+            codeBookBlockSize = codeBookBlocks.get(0).get(0).size();
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+        ArrayList<ArrayList<Integer>> image = new ArrayList<ArrayList<Integer>>();
+        ArrayList<ArrayList<Integer>> compressedImage = new ArrayList<ArrayList<Integer>>();
+
+        System.out.println("Compressed image file name: ");
+        String compressedImageFile = consoleScanner.nextLine();
+        try (Scanner compressedImageScanner = new Scanner(new File(compressedImageFile))) {
+            while (compressedImageScanner.hasNextLine()) {
+                ArrayList<Integer> lineInteger = new ArrayList<>();
+                String[] line = compressedImageScanner.nextLine().split(" ");
+                for (String s : line) {
+                    lineInteger.add(Integer.parseInt(s));
+                }
+                compressedImage.add(lineInteger);
+            }
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+        imageHeight = compressedImage.size() * codeBookBlockSize;
+        imageWidth = compressedImage.get(0).size() * codeBookBlockSize;
+        for (int i = 0; i < imageHeight; i++) {
+            ArrayList<Integer> line = new ArrayList<>();
+            for (int j = 0; j < imageWidth; j++) {
+                int blockIndex = compressedImage.get(i / codeBookBlockSize).get(j / codeBookBlockSize);
+                line.add((codeBookBlocks.get(blockIndex).get(i % codeBookBlockSize).get(j % codeBookBlockSize)).intValue());
+            }
+            image.add(line);
+        }
+        return image;
+    }
+
+    public static void main(String[] args) throws IOException {
 
         Scanner scanner = new Scanner(System.in);
         String choice = "";
@@ -580,8 +635,9 @@ public class Vector_Quantization {
                 }
             
             } else if (choice.equals("2")) {
-                
-                // decompression pipeline here
+                ArrayList<ArrayList<Integer>> grayscaleValues = constructDecompressedImage();
+                System.out.println("Decompressed image name: ");
+                writeGrayscaleImage(grayscaleValues, scanner.nextLine());
 
             } else if ("x".equals(choice)) {
                 System.out.println("\nThank you for using our Vector Quantization Compression app!");
