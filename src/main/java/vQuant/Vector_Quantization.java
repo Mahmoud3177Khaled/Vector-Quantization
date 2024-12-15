@@ -509,8 +509,11 @@ public class Vector_Quantization {
     }
 
     public static ArrayList<ArrayList<Integer>> constructDecompressedImage() {
+        System.out.println("Code book file name: ");
+        Scanner consoleScanner = new Scanner(System.in);
+        String codeBookFile = consoleScanner.nextLine();
         codeBookBlocks = new ArrayList<ArrayList<ArrayList<Double>>>();
-        try(Scanner codeBookScanner = new Scanner(new File("codebook.txt"))) {
+        try(Scanner codeBookScanner = new Scanner(new File(codeBookFile))) {
             while (codeBookScanner.hasNextLine()) {
                 if (!codeBookScanner.hasNextInt())
                     break;
@@ -533,7 +536,9 @@ public class Vector_Quantization {
         ArrayList<ArrayList<Integer>> image = new ArrayList<ArrayList<Integer>>();
         ArrayList<ArrayList<Integer>> compressedImage = new ArrayList<ArrayList<Integer>>();
 
-        try (Scanner compressedImageScanner = new Scanner(new File("comressedImage.txt"))) {
+        System.out.println("Compressed image file name: ");
+        String compressedImageFile = consoleScanner.nextLine();
+        try (Scanner compressedImageScanner = new Scanner(new File(compressedImageFile))) {
             while (compressedImageScanner.hasNextLine()) {
                 ArrayList<Integer> lineInteger = new ArrayList<>();
                 String[] line = compressedImageScanner.nextLine().split(" ");
@@ -558,7 +563,7 @@ public class Vector_Quantization {
         return image;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
 
         Scanner scanner = new Scanner(System.in);
         String choice = "";
@@ -629,8 +634,9 @@ public class Vector_Quantization {
                 }
             
             } else if (choice.equals("2")) {
-                
-                // decompression pipeline here
+                ArrayList<ArrayList<Integer>> grayscaleValues = constructDecompressedImage();
+                System.out.println("Decompressed image name: ");
+                writeGrayscaleImage(grayscaleValues, scanner.nextLine());
 
             } else if ("x".equals(choice)) {
                 System.out.println("\nThank you for using our Vector Quantization Compression app! \nHave a nice day! :)\n");
