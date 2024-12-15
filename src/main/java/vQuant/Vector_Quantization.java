@@ -525,6 +525,7 @@ public class Vector_Quantization {
             if(choice.equals("1")) {
                 itr = 1;
                 codeBookBlocks.clear();
+                imageAsBlocksWithIndexes.clear();
                 notSameImageBlocksIndexes = true;
                 
                 System.out.println("Path to image to compress: ");
@@ -583,7 +584,11 @@ public class Vector_Quantization {
                 // decompression pipeline here
 
             } else if ("x".equals(choice)) {
-                System.out.println("\nThank you for using our Vector Quantization Compression app! \nHave a nice day! :)\n");
+                System.out.println("\nThank you for using our Vector Quantization Compression app!");
+                System.out.println("Made with passion by: ");
+                System.out.println("\n1. Ziad Mohamed");
+                System.out.println("2. Mahmoud khaled\n");
+                System.out.println("- Have a nice day! :)\n");
 
             } else if (!"x".equals(choice)) {
                 System.out.println("Please select 1 to compress, 2 to decompress");
