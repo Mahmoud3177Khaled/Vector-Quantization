@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 import javax.imageio.ImageIO;
 
@@ -476,9 +477,9 @@ public class Vector_Quantization {
         // return compressedImageInCodeBookBlocks;
     }
 
-    public static void saveCodeBooksToFile() {
+    public static void saveCodeBooksToFile(String codeBookPath) {
         try {
-            FileWriter writer = new FileWriter(new File("codebook.txt"));
+            FileWriter writer = new FileWriter(new File(codeBookPath + ".txt"));
             
             String row = "";
             int i = 0;
@@ -508,111 +509,189 @@ public class Vector_Quantization {
     }
 
     public static void main(String[] args) {
-        // String inputImagePath = "test.bmp"; // Replace with your BMP input image path
-        String inputImagePath = "photographer.bmp";
-        // String outputImagePath = "output_image.bmp"; // Replace with your BMP output image path
 
-        try {
-            createTestImage();
+        Scanner scanner = new Scanner(System.in);
+        String choice = "";
 
-            ArrayList<ArrayList<Integer>> inputImage = readGrayscaleImage(inputImagePath);
-            // ArrayList<ArrayList<Double>> outputImage = new ArrayList<ArrayList<Double>>();
+        while (!"x".equals(choice)) { 
 
-            // size of code book block
-            codeBookBlockSize = 2;
-            // size of code book
-            codeBookSize = 3;
-
-            cutImageIntoBlocks(inputImage);
-
-
-            ArrayList<ArrayList<Double>> firstBlock = getFirstCodeBlock(inputImage);
-            codeBookBlocks.add(firstBlock);
-
-            while (codeBookSize != 0) {
-
-                splitCodeBlock();
-                allocateToCodeBlock();
-                itr++;
-                getNewCodeBlockUsingAvgs();
-                // System.out.println(notSameImageBlocksIndexes);
-                codeBookSize--;
-            }
-
-            itr--;
-            // System.out.println(notSameImageBlocksIndexes);
-            while (notSameImageBlocksIndexes) {
-                getNewCodeBlockUsingAvgs();
-                allocateToCodeBlock();
-
-            }
-            // allocateToCodeBlock();
-
-            // while (codeBookSize != 0) {
-
-            //     splitCodeBlock();
-            //     allocateToCodeBlock();
-            //     itr++;
-            //     if(codeBookSize > 0) {
-            //         getNewCodeBlockUsingAvgs();
-            //         // allocateToCodeBlock();
-            //         // getNewCodeBlockUsingAvgs();
-            //         // allocateToCodeBlock();
-            //     }
-            //     codeBookSize--;
-            // }
-            // itr--;
-            // allocateToCodeBlock();
-            // getNewCodeBlockUsingAvgs();
-            // allocateToCodeBlock();
-            // // allocateToCodeBlock();
-            // // allocateToCodeBlock();
-            // // getNewCodeBlockUsingAvgs();
-            // // allocateToCodeBlock();
-            // // allocateToCodeBlock();
-
-            compileCompressedImage("comressedImage");
-            saveCodeBooksToFile();
-
-
-            for (ImageBlock imageBlock : imageAsBlocksWithIndexes) {
+            System.out.println("\nWelcome to Vector Quantization Compression! \n");
+            System.out.println("Please select an option: ");
+            System.out.println("1. Compress a gray scale image");
+            System.out.println("2. Decompress an image using a code book ");
             
-                System.out.println("index: " + imageBlock.index);
-                for (int i = 0; i < codeBookBlockSize; i++) {
-                    for (int j = 0; j < codeBookBlockSize; j++) {
-                        System.out.print(imageBlock.block.get(i).get(j) + " ");
-                        
-                    }
-                    System.out.println();
-                }
-                System.out.println();
-            }
-            System.out.println();
-            System.out.println();
-            System.out.println();
+            choice = scanner.nextLine();
+            
+            if(choice.equals("1")) {
+                itr = 1;
+                codeBookBlocks.clear();
+                notSameImageBlocksIndexes = true;
+                
+                System.out.println("Path to image to compress: ");
+                String inputImagePath = scanner.nextLine() + ".bmp";
 
-            for (ArrayList<ArrayList<Double>> codeBlock : codeBookBlocks) {
-                for (int i = 0; i < codeBookBlockSize; i++) {
-                    for (int j = 0; j < codeBookBlockSize; j++) {
-                        System.out.print(codeBlock.get(i).get(j) + " ");
-                    }
-                    System.out.println();
-                }
-                System.out.println();
-            }   
-            System.out.println(codeBookBlocks.size());
-
-
-            // for (int i = 0; i < 2; i++) {
-            //     for (int j = 0; j < 2; j++) {
+                try {
+                ArrayList<ArrayList<Integer>> inputImage = readGrayscaleImage(inputImagePath);
+                
+                // size of code book block
+                System.out.println("Enter Block size: ");
+                codeBookBlockSize = Integer.parseInt(scanner.nextLine());
                     
-            //         System.out.print(firstBlock.get(i).get(j) + " ");
-            //     }
-            //     System.out.println();
-            // }
+                if(imageWidth % codeBookBlockSize != 0) {
+                    System.out.println("can't device " + imageWidth + " into " + codeBookBlockSize + " blocks");
+                    continue;
+                }
 
-        } catch (IOException e) {
-            System.err.println("Error processing the image: " + e.getMessage());
+                // size of code book
+                System.out.println("Enter Code Book size: ");
+                codeBookSize = Integer.parseInt(scanner.nextLine());
+
+                cutImageIntoBlocks(inputImage);
+
+                ArrayList<ArrayList<Double>> firstBlock = getFirstCodeBlock(inputImage);
+                codeBookBlocks.add(firstBlock);
+
+                while (codeBookSize != 0) {
+
+                    splitCodeBlock();
+                    allocateToCodeBlock();
+                    itr++;
+                    getNewCodeBlockUsingAvgs();
+                    codeBookSize--;
+                }
+    
+                itr--;
+                while (notSameImageBlocksIndexes) {
+                    getNewCodeBlockUsingAvgs();
+                    allocateToCodeBlock();
+    
+                }
+
+                System.out.println("Save compressed image as: ");
+                compileCompressedImage(scanner.nextLine());
+                System.out.println("Save code book as: ");
+                saveCodeBooksToFile(scanner.nextLine());
+                
+                System.out.println("\n*** COMPRESSION DONE!! ***\n");
+
+                } catch (IOException ex) {
+                    System.out.println("cannot read image, amke sure it is grayscale");
+                }
+            
+            } else if (choice.equals("2")) {
+                
+                // decompression pipeline here
+
+            } else if ("x".equals(choice)) {
+                System.out.println("\nThank you for using our Vector Quantization Compression app! \nHave a nice day! :)\n");
+
+            } else if (!"x".equals(choice)) {
+                System.out.println("Please select 1 to compress, 2 to decompress");
+
+            }
         }
+
+        // try {
+        //     createTestImage();
+
+        //     ArrayList<ArrayList<Integer>> inputImage = readGrayscaleImage(inputImagePath);
+        //     // ArrayList<ArrayList<Double>> outputImage = new ArrayList<ArrayList<Double>>();
+
+        //     // size of code book block
+        //     codeBookBlockSize = 2;
+        //     // size of code book
+        //     codeBookSize = 2;
+
+        //     cutImageIntoBlocks(inputImage);
+
+
+        //     ArrayList<ArrayList<Double>> firstBlock = getFirstCodeBlock(inputImage);
+        //     codeBookBlocks.add(firstBlock);
+
+        //     while (codeBookSize != 0) {
+
+        //         splitCodeBlock();
+        //         allocateToCodeBlock();
+        //         itr++;
+        //         getNewCodeBlockUsingAvgs();
+        //         // System.out.println(notSameImageBlocksIndexes);
+        //         codeBookSize--;
+        //     }
+
+        //     itr--;
+        //     // System.out.println(notSameImageBlocksIndexes);
+        //     while (notSameImageBlocksIndexes) {
+        //         getNewCodeBlockUsingAvgs();
+        //         allocateToCodeBlock();
+
+        //     }
+        //     // allocateToCodeBlock();
+
+        //     // while (codeBookSize != 0) {
+
+        //     //     splitCodeBlock();
+        //     //     allocateToCodeBlock();
+        //     //     itr++;
+        //     //     if(codeBookSize > 0) {
+        //     //         getNewCodeBlockUsingAvgs();
+        //     //         // allocateToCodeBlock();
+        //     //         // getNewCodeBlockUsingAvgs();
+        //     //         // allocateToCodeBlock();
+        //     //     }
+        //     //     codeBookSize--;
+        //     // }
+        //     // itr--;
+        //     // allocateToCodeBlock();
+        //     // getNewCodeBlockUsingAvgs();
+        //     // allocateToCodeBlock();
+        //     // // allocateToCodeBlock();
+        //     // // allocateToCodeBlock();
+        //     // // getNewCodeBlockUsingAvgs();
+        //     // // allocateToCodeBlock();
+        //     // // allocateToCodeBlock();
+
+        //     compileCompressedImage("comressedImage");
+        //     saveCodeBooksToFile();
+
+
+        //     for (ImageBlock imageBlock : imageAsBlocksWithIndexes) {
+            
+        //         System.out.println("index: " + imageBlock.index);
+        //         for (int i = 0; i < codeBookBlockSize; i++) {
+        //             for (int j = 0; j < codeBookBlockSize; j++) {
+        //                 System.out.print(imageBlock.block.get(i).get(j) + " ");
+                        
+        //             }
+        //             System.out.println();
+        //         }
+        //         System.out.println();
+        //     }
+        //     System.out.println();
+        //     System.out.println();
+        //     System.out.println();
+
+        //     for (ArrayList<ArrayList<Double>> codeBlock : codeBookBlocks) {
+        //         for (int i = 0; i < codeBookBlockSize; i++) {
+        //             for (int j = 0; j < codeBookBlockSize; j++) {
+        //                 System.out.print(codeBlock.get(i).get(j) + " ");
+        //             }
+        //             System.out.println();
+        //         }
+        //         System.out.println();
+        //     }   
+        //     System.out.println(codeBookBlocks.size());
+
+
+        //     // for (int i = 0; i < 2; i++) {
+        //     //     for (int j = 0; j < 2; j++) {
+                    
+        //     //         System.out.print(firstBlock.get(i).get(j) + " ");
+        //     //     }
+        //     //     System.out.println();
+        //     // }
+
+        // } catch (IOException e) {
+        //     System.err.println("Error processing the image: " + e.getMessage());
+        // }
     }
 }
