@@ -509,9 +509,10 @@ public class Vector_Quantization {
     }
 
     public static ArrayList<ArrayList<Integer>> constructDecompressedImage() {
+        codeBookBlockSize = 0;
         System.out.println("Code book file name: ");
         Scanner consoleScanner = new Scanner(System.in);
-        String codeBookFile = consoleScanner.nextLine();
+        String codeBookFile = consoleScanner.nextLine() + ".txt";
         codeBookBlocks = new ArrayList<ArrayList<ArrayList<Double>>>();
         try(Scanner codeBookScanner = new Scanner(new File(codeBookFile))) {
             while (codeBookScanner.hasNextLine()) {
@@ -519,13 +520,16 @@ public class Vector_Quantization {
                     break;
                 codeBookScanner.nextLine();
                 ArrayList<ArrayList<Double>> block = new ArrayList<>();
-                for (int i = 0; i < codeBookBlockSize; i++) {
+                int i = 0;
+                while (codeBookScanner.hasNextDouble() && (codeBookBlockSize == 0 || i < codeBookBlockSize)) {
                     ArrayList<Double> lineDouble = new ArrayList<Double>();
                     String[] line = codeBookScanner.nextLine().split(" ");
+                    codeBookBlockSize = line.length;
                     for (String s : line) {
                         lineDouble.add(Double.parseDouble(s));
                     }
                     block.add(lineDouble);
+                    ++i;
                 }
                 codeBookBlocks.add(block);
             }
@@ -537,7 +541,7 @@ public class Vector_Quantization {
         ArrayList<ArrayList<Integer>> compressedImage = new ArrayList<ArrayList<Integer>>();
 
         System.out.println("Compressed image file name: ");
-        String compressedImageFile = consoleScanner.nextLine();
+        String compressedImageFile = consoleScanner.nextLine() + ".txt";
         try (Scanner compressedImageScanner = new Scanner(new File(compressedImageFile))) {
             while (compressedImageScanner.hasNextLine()) {
                 ArrayList<Integer> lineInteger = new ArrayList<>();
@@ -637,7 +641,7 @@ public class Vector_Quantization {
             } else if (choice.equals("2")) {
                 ArrayList<ArrayList<Integer>> grayscaleValues = constructDecompressedImage();
                 System.out.println("Decompressed image name: ");
-                writeGrayscaleImage(grayscaleValues, scanner.nextLine());
+                writeGrayscaleImage(grayscaleValues, scanner.nextLine()+".bmp");
 
             } else if ("x".equals(choice)) {
                 System.out.println("\nThank you for using our Vector Quantization Compression app!");
